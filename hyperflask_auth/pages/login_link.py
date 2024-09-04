@@ -1,7 +1,8 @@
 from hyperflask import page, request, redirect, url_for, current_app, session, abort
+from hyperflask.utils.request import is_safe_redirect_url
 from hyperflask_auth import UserModel
 from hyperflask_auth.flow import login
-from hyperflask.utils.request import is_safe_redirect_url
+from hyperflask_auth.captcha import validate_captcha_when_configured
 
 
 if "login_user" not in session:
@@ -21,6 +22,7 @@ def get():
         return _redirect()
 
 
+@validate_captcha_when_configured
 def post():
     if form.validate():
         if form.code.data == session.pop('login_code'):

@@ -1,6 +1,7 @@
-from hyperflask import page, request, redirect, url_for, current_app
-from hyperflask_auth.flow import signup
+from hyperflask import page, request, redirect, url_for, current_app, abort
 from hyperflask.utils.request import is_safe_redirect_url
+from hyperflask_auth.flow import signup
+from hyperflask_auth.captcha import validate_captcha_when_configured
 
 
 if "signup" not in current_app.extensions['auth'].allowed_methods:
@@ -12,6 +13,7 @@ if "signup" not in current_app.extensions['auth'].allowed_methods:
 form = page.form()
 
 
+@validate_captcha_when_configured
 def post():
     if form.validate():
         try:

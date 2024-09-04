@@ -1,7 +1,8 @@
 from hyperflask import page, request, redirect, url_for, current_app, session, abort
+from hyperflask.utils.request import is_safe_redirect_url
 from hyperflask_auth import UserModel
 from hyperflask_auth.flow import login, send_login_link
-from hyperflask.utils.request import is_safe_redirect_url
+from hyperflask_auth.captcha import validate_captcha_when_configured
 
 
 if "login" not in current_app.extensions['auth'].allowed_methods:
@@ -13,6 +14,7 @@ if "login" not in current_app.extensions['auth'].allowed_methods:
 form = page.form()
 
 
+@validate_captcha_when_configured
 def post():
     if form.validate():
         if "username_or_email" in form:

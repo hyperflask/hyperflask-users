@@ -8,7 +8,7 @@
 {% block auth_content %}
 <{Form}>
   <{FormControl label="Code"}>
-    {{ form.code.text(placeholder="4-digit code", required=True) }}
+    {{ form.code.text(placeholder="6-digit code", required=True) }}
   </{}>
   <div>
     <{LabeledCheckbox name="remember" value=1 label="Remember me"}/>

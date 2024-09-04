@@ -39,8 +39,8 @@ def login(user, password=None, remember=False, login_using=None):
 
 def send_login_link(user):
     token = user.create_token()
-    code = str(random.randrange(1000, 9999))
-    send_mail("auth/login_link.md", user.email, token=token, code=code)
+    code = str(random.randrange(10000, 99999))
+    send_mail("auth/login_link.mjml", user.email, token=token, code=code)
     return code
 
 
@@ -54,7 +54,7 @@ def validate_password(password):
 
 def send_reset_password_email(user):
     token = user.create_token()
-    send_mail("auth/forgot_password.md", user.email, token=token)
+    send_mail("auth/forgot_password.mjml", user.email, token=token)
     return token
 
 

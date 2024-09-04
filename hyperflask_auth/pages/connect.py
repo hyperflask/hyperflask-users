@@ -1,7 +1,8 @@
 from hyperflask import page, request, redirect, url_for, session, current_app, abort
+from hyperflask.utils.request import is_safe_redirect_url
 from hyperflask_auth import UserModel
 from hyperflask_auth.flow import signup, send_login_link
-from hyperflask.utils.request import is_safe_redirect_url
+from hyperflask_auth.captcha import validate_captcha_when_configured
 
 
 if "connect" not in current_app.extensions['auth'].allowed_methods:
@@ -14,6 +15,7 @@ form = page.form()
 next = request.args.get("next")
 
 
+@validate_captcha_when_configured
 def post():
     if form.validate():
         user = UserModel.find_one(email=form.email.data)
