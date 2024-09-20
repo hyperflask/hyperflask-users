@@ -39,7 +39,7 @@ def login(user, password=None, remember=False, login_using=None):
 
 def send_login_link(user):
     token = user.create_token()
-    code = str(random.randrange(10000, 99999))
+    code = str(random.randrange(100000, 999999))
     send_mail("auth/login_link.mjml", user.email, token=token, code=code)
     return code
 
