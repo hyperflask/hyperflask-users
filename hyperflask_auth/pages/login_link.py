@@ -26,7 +26,7 @@ def get():
 def post():
     if form.validate():
         if form.code.data == session.pop('login_code'):
-            login(user, remember=request.form.get("remember") == "1")
+            login(user, remember=request.form.get("remember") == "1", validate_email=True)
             clear_session()
             return _redirect()
         clear_session()
@@ -36,7 +36,6 @@ def post():
 def _redirect():
     next = request.args.get("next")
     return redirect(next if next and is_safe_redirect_url(next) else current_app.extensions['auth'].login_redirect_url)
-
 
 
 def clear_session():

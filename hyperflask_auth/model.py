@@ -2,7 +2,7 @@ from flask_login import *
 from flask_login import UserMixin as _UserMixin
 from sqlorm import SQL, execute, Model, Column
 from werkzeug.local import LocalProxy
-from hyperflask import db, abort
+from hyperflask import current_app, abort
 from hyperflask.utils.tokens import create_token, load_token
 from .passlib import hash_password, verify_password
 import abc
@@ -14,7 +14,7 @@ class MissingUserModelError(Exception):
 
 
 def get_user_model():
-    for model in db.Model.__model_registry__.values():
+    for model in current_app.db.Model.__model_registry__.values():
         if issubclass(model, UserMixin):
             return model
     raise MissingUserModelError()
@@ -26,6 +26,8 @@ UserModel = LocalProxy(get_user_model)
 class UserMixin(_UserMixin, Model, abc.ABC):
     email = Column(type=str)
     password = Column(type=str)
+    email_validated = Column(type=bool, default=False)
+    email_validated_at = Column(type=datetime.datetime)
     signup_at = Column(type=datetime.datetime, default=datetime.datetime.utcnow)
     signup_from = Column(type=str)
     signup_using = Column(type=str)
@@ -56,6 +58,10 @@ class UserMixin(_UserMixin, Model, abc.ABC):
 
     def create_token(self, **serializer_kwargs):
         return create_token(self.__mapper__.get_primary_key(self), **serializer_kwargs)
+
+    def validate_email(self):
+        self.email_validated = True
+        self.email_validated_at = datetime.datetime.utcnow()
 
 
 class UserRelatedMixin(Model, abc.ABC):

@@ -1,7 +1,11 @@
-from hyperflask import page, current_app, flash
+from hyperflask import page, current_app, flash, abort
 from hyperflask_auth import UserModel
 from hyperflask_auth.flow import send_reset_password_email
 from hyperflask_auth.captcha import validate_captcha_when_configured
+
+
+if "password" not in current_app.extensions['auth'].allowed_flows and "password_reset" not in current_app.extensions['auth'].allowed_flows:
+    abort(404)
 
 
 form = page.form()

@@ -5,9 +5,9 @@ from hyperflask_auth.flow import signup, send_login_link
 from hyperflask_auth.captcha import validate_captcha_when_configured
 
 
-if "connect" not in current_app.extensions['auth'].allowed_methods:
-    if "login" in current_app.extensions['auth'].allowed_methods:
-        page.respond(redirect(url_for(".login", next=request.args.get("next"))))
+if "connect" not in current_app.extensions['auth'].allowed_flows:
+    if "login" in current_app.extensions['auth'].allowed_flows or "password" in current_app.extensions['auth'].allowed_flows:
+        page.redirect(url_for(".login", next=request.args.get("next")))
     abort(404)
 
 

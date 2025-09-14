@@ -1,8 +1,12 @@
-from hyperflask import redirect, request, page, current_app
+from hyperflask import redirect, request, page, current_app, abort
 from hyperflask.utils.request import is_safe_redirect_url
 from hyperflask_auth import UserModel
 from hyperflask_auth.flow import reset_password
 from hyperflask_auth.captcha import validate_captcha_when_configured
+
+
+if "password" not in current_app.extensions['auth'].allowed_flows and "password_reset" not in current_app.extensions['auth'].allowed_flows:
+    abort(404)
 
 
 form = page.form()
