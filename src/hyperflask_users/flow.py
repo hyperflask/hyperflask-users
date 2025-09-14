@@ -26,7 +26,7 @@ def signup(data=None, **kwargs):
     current_app.logger.info(f"[AUTH] New signup for user #{user.id}")
     signals.user_signed_up.send(current_app, user=user)
     login(user)
-    email_template = current_app.extensions['auth'].signup_email_template
+    email_template = current_app.extensions['users'].signup_email_template
     if email_template:
         send_mail(email_template, user.email, user=user)
     return user
@@ -48,7 +48,7 @@ def login(user, password=None, remember=False, login_using=None, validate_email=
 def send_login_link(user):
     token = user.create_token()
     code = str(random.randrange(100000, 999999))
-    send_mail("auth/login_link.mjml", user.email, token=token, code=code)
+    send_mail("users/login_link.mjml", user.email, token=token, code=code)
     current_app.logger.debug(f"[AUTH] Login link with code {code} email sent to {user.email}")
     return code
 
@@ -63,7 +63,7 @@ def validate_password(password):
 
 def send_reset_password_email(user):
     token = user.create_token()
-    send_mail("auth/forgot_password.mjml", user.email, token=token)
+    send_mail("users/forgot_password.mjml", user.email, token=token)
     current_app.logger.info(f"[AUTH] Password reset email sent to user #{user.id}")
     return token
 
@@ -75,6 +75,6 @@ def reset_password(user, password):
         user.update_password(password)
     current_app.logger.info(f"[AUTH] Password reset for user #{user.id}")
     login(user)
-    email_template = current_app.extensions['auth'].reset_password_email_template
+    email_template = current_app.extensions['users'].reset_password_email_template
     if email_template:
         send_mail(email_template, user.email, user=user)

@@ -1,12 +1,12 @@
 from hyperflask import page, request, redirect, url_for, current_app, session, abort
 from hyperflask.utils.request import is_safe_redirect_url
-from hyperflask_auth import UserModel
-from hyperflask_auth.flow import login, send_login_link
-from hyperflask_auth.captcha import validate_captcha_when_configured
+from .. import UserModel
+from ..flow import login, send_login_link
+from ..captcha import validate_captcha_when_configured
 
 
-if "login" not in current_app.extensions['auth'].allowed_flows and "password" not in current_app.extensions['auth'].allowed_flows:
-    if "connect" in current_app.extensions['auth'].allowed_flows:
+if "login" not in current_app.extensions['users'].allowed_flows and "password" not in current_app.extensions['users'].allowed_flows:
+    if "connect" in current_app.extensions['users'].allowed_flows:
         page.redirect(url_for(".connect", next=request.args.get("next")))
     abort(404)
 
@@ -33,6 +33,6 @@ def post():
             try:
                 login(user, form.password.data, remember=remember)
                 next = request.args.get("next")
-                return redirect(next if next and is_safe_redirect_url(next) else current_app.extensions['auth'].login_redirect_url)
+                return redirect(next if next and is_safe_redirect_url(next) else current_app.extensions['users'].login_redirect_url)
             except:
                 pass

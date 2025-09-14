@@ -1,8 +1,8 @@
 from hyperflask import page, request, redirect, url_for, current_app, session, abort
 from hyperflask.utils.request import is_safe_redirect_url
-from hyperflask_auth import UserModel
-from hyperflask_auth.flow import login
-from hyperflask_auth.captcha import validate_captcha_when_configured
+from .. import UserModel
+from ..flow import login
+from ..captcha import validate_captcha_when_configured
 
 
 if "login_user" not in session:
@@ -14,7 +14,7 @@ user = UserModel.get(session['login_user'])
 
 def get():
     if "token" in request.args:
-        user_ = UserModel.from_token_or_404(request.args["token"], max_age=current_app.extensions['auth'].token_max_age)
+        user_ = UserModel.from_token_or_404(request.args["token"], max_age=current_app.extensions['users'].token_max_age)
         if user_.get_id() != user.get_id():
             abort(403)
         login(user)
@@ -35,7 +35,7 @@ def post():
 
 def _redirect():
     next = request.args.get("next")
-    return redirect(next if next and is_safe_redirect_url(next) else current_app.extensions['auth'].login_redirect_url)
+    return redirect(next if next and is_safe_redirect_url(next) else current_app.extensions['users'].login_redirect_url)
 
 
 def clear_session():

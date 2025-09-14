@@ -1,11 +1,11 @@
 from hyperflask import page, request, redirect, url_for, current_app, abort
 from hyperflask.utils.request import is_safe_redirect_url
-from hyperflask_auth.flow import signup
-from hyperflask_auth.captcha import validate_captcha_when_configured
+from ..flow import signup
+from ..captcha import validate_captcha_when_configured
 
 
-if "signup" not in current_app.extensions['auth'].allowed_flows and "password" not in current_app.extensions['auth'].allowed_flows:
-    if "connect" in current_app.extensions['auth'].allowed_flows:
+if "signup" not in current_app.extensions['users'].allowed_flows and "password" not in current_app.extensions['users'].allowed_flows:
+    if "connect" in current_app.extensions['users'].allowed_flows:
         page.redirect(url_for(".connect", next=request.args.get("next")))
     abort(404)
 
@@ -19,6 +19,6 @@ def post():
         try:
             signup(form.data)
             next = request.args.get("next")
-            return redirect(next if next and is_safe_redirect_url(next) else current_app.extensions['auth'].signup_default_redirect_url)
+            return redirect(next if next and is_safe_redirect_url(next) else current_app.extensions['users'].signup_default_redirect_url)
         except Exception as e:
             pass

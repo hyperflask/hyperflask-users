@@ -8,6 +8,6 @@ title: "Sign in to {{config.get('SITE_TITLE', 'our site')}}"
     Use the following code to connect now:
 </mj-text>
 <mj-text align="center" font-weight="bold" font-size="20px" padding-top="30px" padding-bottom="30px">{{code}}</mj-text>
-<mj-button href="{{url_for("auth.login_link", token=token, _external=True)}}">
+<mj-button href="{{url_for("users.login_link", token=token, _external=True)}}">
     Click here to login via a link
 </mj-button>

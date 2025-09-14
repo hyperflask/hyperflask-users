@@ -1,4 +1,4 @@
-{% extends "auth/layout.html" %}
+{% extends "users/auth-layout.html" %}
 
 {% block auth_header %}
   <h3 class="font-semibold text-2xl text-gray-800 dark:text-white">{{_("Sign In")}}</h3>
@@ -13,7 +13,7 @@
     <{LabeledCheckbox name="remember" value=1 label=_("Remember me")}/>
   </div>
   <div class="text-sm">
-    <{Link href=url_for("auth.forgot_password")}>{{_("Forgot your password?")}}</{}>
+    <{Link href=url_for("users.forgot_password")}>{{_("Forgot your password?")}}</{}>
   </div>
   <{SubmitButton}>{{_("Sign in")}}</{}>
 </{}>

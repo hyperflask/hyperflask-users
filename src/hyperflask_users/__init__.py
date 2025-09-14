@@ -4,7 +4,7 @@ from sqlorm.sql_template import SQLTemplate
 from jinja2 import FileSystemLoader
 from hyperflask import lazy_gettext
 from .model import UserMixin, UserModel, UserRelatedMixin, MissingUserModelError
-from .blueprint import auth_blueprint
+from .blueprint import users_blueprint
 from .jinja_ext import LoginRequiredExtension, AnonymousOnlyExtension
 from .flow import signup, login, logout, validate_password, send_reset_password_email, reset_password
 from .signals import *
@@ -14,7 +14,7 @@ import os
 
 
 @dataclass
-class AuthState:
+class UsersState:
     signup_default_redirect_url: str
     reset_password_redirect_url: str
     login_redirect_url: str
@@ -26,26 +26,26 @@ class AuthState:
     reset_password_email_template: t.Optional[str]
 
 
-class Auth:
+class Users:
     def __init__(self, app=None):
         if app:
             self.init_app(app)
 
     def init_app(self, app, register_blueprint=True):
-        state = app.extensions['auth'] = AuthState(
-            signup_default_redirect_url=app.config.get('AUTH_SIGNUP_DEFAULT_REDIRECT_URL', '/'),
-            signup_email_template=app.config.get('AUTH_SIGNUP_EMAIL_TEMPLATE'),
-            login_redirect_url=app.config.get('AUTH_LOGIN_REDIRECT_URL', '/'),
-            forgot_password_flash_message=app.config.get('AUTH_FORGOT_PASSWORD_FLASH_MESSAGE', lazy_gettext("An email has been sent with instructions on how to reset your password")),
-            reset_password_email_template=app.config.get('AUTH_RESET_PASSWORD_EMAIL_TEMPLATE'),
-            reset_password_redirect_url=app.config.get('AUTH_RESET_PASSWORD_REDIRECT_URL', '/'),
-            logout_redirect_url=app.config.get('AUTH_LOGOUT_REDIRECT_URL', '/'),
-            token_max_age=app.config.get('AUTH_TOKEN_MAX_AGE', 3600),
-            allowed_flows=app.config.get('AUTH_ALLOWED_FLOWS', ['connect']),
+        state = app.extensions['users'] = UsersState(
+            signup_default_redirect_url=app.config.get('USERS_SIGNUP_DEFAULT_REDIRECT_URL', '/'),
+            signup_email_template=app.config.get('USERS_SIGNUP_EMAIL_TEMPLATE'),
+            login_redirect_url=app.config.get('USERS_LOGIN_REDIRECT_URL', '/'),
+            forgot_password_flash_message=app.config.get('USERS_FORGOT_PASSWORD_FLASH_MESSAGE', lazy_gettext("An email has been sent with instructions on how to reset your password")),
+            reset_password_email_template=app.config.get('USERS_RESET_PASSWORD_EMAIL_TEMPLATE'),
+            reset_password_redirect_url=app.config.get('USERS_RESET_PASSWORD_REDIRECT_URL', '/'),
+            logout_redirect_url=app.config.get('USERS_LOGOUT_REDIRECT_URL', '/'),
+            token_max_age=app.config.get('USERS_TOKEN_MAX_AGE', 3600),
+            allowed_flows=app.config.get('USERS_ALLOWED_FLOWS', ['connect']),
         )
 
         manager = LoginManager(app)
-        manager.login_view = 'auth.connect' if 'connect' in state.allowed_flows else 'auth.login'
+        manager.login_view = 'users.connect' if 'connect' in state.allowed_flows else 'users.login'
 
         @manager.user_loader
         def load_user(user_id):
@@ -63,4 +63,4 @@ class Auth:
         app.assets.state.tailwind_sources.append(os.path.join(os.path.dirname(__file__), "templates"))
         app.extensions['mail_templates'].loaders.append(FileSystemLoader(os.path.join(os.path.dirname(__file__), 'emails')))
         if register_blueprint:
-            app.register_blueprint(auth_blueprint)
+            app.register_blueprint(users_blueprint)
