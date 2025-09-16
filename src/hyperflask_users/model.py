@@ -1,6 +1,6 @@
-from flask_login import *
-from flask_login import UserMixin as _UserMixin
-from sqlorm import SQL, execute, Model, Column
+from flask_login import current_user, UserMixin as _UserMixin
+from sqlorm import SQL, execute, Column, Relationship
+from flask_sqlorm import Model
 from werkzeug.local import LocalProxy
 from hyperflask import current_app, abort
 from hyperflask.utils.tokens import create_token, load_token
@@ -66,22 +66,23 @@ class UserMixin(_UserMixin, Model, abc.ABC):
 
 class UserRelatedMixin(Model, abc.ABC):
     user_id: int
+    user = Relationship(UserModel, "user_id", single=True)
 
     @classmethod
     def find_all_for_current_user(cls, *args, **kwargs):
-        return super().find_all(*args, user_id=current_user.id, **kwargs)
+        return cls.find_all(*args, user_id=current_user.id, **kwargs)
 
     @classmethod
     def find_one_for_current_user(cls, *args, **kwargs):
-        return super().find_one(*args, user_id=current_user.id, **kwargs)
+        return cls.find_one(*args, user_id=current_user.id, **kwargs)
 
     @classmethod
     def find_one_for_current_user_or_404(cls, *args, **kwargs):
-        return super().find_one_or_404(*args, user_id=current_user.id, **kwargs)
+        return cls.find_one_or_404(*args, user_id=current_user.id, **kwargs)
 
     @classmethod
     def get_for_current_user(cls, pk, **kwargs):
-        return super().find_one(cls.__mapper__.primary_key_condition(pk), user_id=current_user.id, **kwargs)
+        return cls.find_one(cls.__mapper__.primary_key_condition(pk), user_id=current_user.id, **kwargs)
 
     @classmethod
     def get_for_current_user_or_404(cls, pk, **kwargs):
@@ -91,5 +92,6 @@ class UserRelatedMixin(Model, abc.ABC):
         return obj
 
     @classmethod
-    def create_for_current_user(self, **kwargs):
-        return super().create(user_id=current_user.id, **kwargs)
+    def create_for_current_user(cls, **kwargs):
+        return cls.create(user=current_user, **kwargs)
+
