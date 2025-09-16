@@ -66,7 +66,7 @@ class UserMixin(_UserMixin, Model, abc.ABC):
 
 class UserRelatedMixin(Model, abc.ABC):
     user_id: int
-    user = Relationship(UserModel, "user_id", single=True)
+    user = Relationship(UserModel, source_col="user_id", single=True)
 
     @classmethod
     def find_all_for_current_user(cls, *args, **kwargs):
