@@ -42,8 +42,8 @@ class UserMixin(_UserMixin, Model, abc.ABC):
             return cls.get(user_id)
 
     @classmethod
-    def from_token_or_404(cls, token):
-        user = cls.from_token(token)
+    def from_token_or_404(cls, token, **serializer_kwargs):
+        user = cls.from_token(token, **serializer_kwargs)
         if not user:
             abort(404)
         return user

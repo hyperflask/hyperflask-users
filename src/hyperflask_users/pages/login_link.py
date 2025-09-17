@@ -5,27 +5,25 @@ from ..flow import login
 from ..captcha import validate_captcha_when_configured
 
 
-if "login_user" not in session:
-    abort(404)
-
 form = page.form()
-user = UserModel.get(session['login_user'])
 
 
 def get():
     if "token" in request.args:
-        user_ = UserModel.from_token_or_404(request.args["token"], max_age=current_app.extensions['users'].token_max_age)
-        if user_.get_id() != user.get_id():
-            abort(403)
-        login(user)
+        user = UserModel.from_token_or_404(request.args["token"], max_age=current_app.extensions['users'].token_max_age)
+        login(user, validate_email=True)
         clear_session()
         return _redirect()
+
+    if "login_user" not in session:
+        abort(404)
 
 
 @validate_captcha_when_configured
 def post():
     if form.validate():
         if form.code.data == session.pop('login_code'):
+            user = UserModel.get(session['login_user'])
             login(user, remember=request.form.get("remember") == "1", validate_email=True)
             clear_session()
             return _redirect()
