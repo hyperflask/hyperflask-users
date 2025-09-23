@@ -1,5 +1,5 @@
 from hyperflask import page, request, redirect, url_for, current_app, session, abort
-from hyperflask.utils.request import is_safe_redirect_url
+from hyperflask.security import is_safe_redirect_url
 from .. import UserModel
 from ..flow import login, send_login_link
 from ..captcha import validate_captcha_when_configured

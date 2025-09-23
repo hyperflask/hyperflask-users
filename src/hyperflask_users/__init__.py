@@ -47,6 +47,9 @@ class Users:
         manager = LoginManager(app)
         manager.login_view = 'users.connect' if 'connect' in state.allowed_flows else 'users.login'
 
+        if register_blueprint:
+            app.register_blueprint(users_blueprint)
+
         @manager.user_loader
         def load_user(user_id):
             try:
@@ -60,7 +63,15 @@ class Users:
         app.jinja_env.globals.update(current_user=current_user)
         app.jinja_env.add_extension(LoginRequiredExtension)
         app.jinja_env.add_extension(AnonymousOnlyExtension)
+        app.macros.register_from_file(os.path.join(os.path.dirname(__file__), "macros.html"))
         app.assets.state.tailwind_sources.append(os.path.join(os.path.dirname(__file__), "templates"))
         app.extensions['mail_templates'].loaders.append(FileSystemLoader(os.path.join(os.path.dirname(__file__), 'emails')))
-        if register_blueprint:
-            app.register_blueprint(users_blueprint)
+        if app.config.get('RECAPTCHA_SITE_KEY'):
+            app.config['CSP_SAFE_URLS'].append('https://www.google.com/recaptcha/api.js')
+            app.config['CSP_SAFE_URLS'].append('https://www.gstatic.com')
+
+        @app.sse.payload_getter
+        def get_sse_payload(topics):
+            if current_user.is_authenticated:
+                return {'user': {k: getattr(current_user, k, None) for k in current_user.__mercure_payload_attrs__}}
+            return {}

@@ -24,6 +24,8 @@ UserModel = LocalProxy(get_user_model)
 
 
 class UserMixin(_UserMixin, Model, abc.ABC):
+    __mercure_payload_attrs__ = ('id', 'display_name')
+
     email = Column(type=str)
     password = Column(type=str)
     email_validated = Column(type=bool, default=False)
@@ -47,6 +49,10 @@ class UserMixin(_UserMixin, Model, abc.ABC):
         if not user:
             abort(404)
         return user
+
+    @property
+    def display_name(self):
+        return self.email
 
     @execute
     def update_password(self, password):
